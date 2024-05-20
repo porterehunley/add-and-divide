@@ -5,6 +5,7 @@ import {
   getFirestore,
   doc,
   updateDoc,
+  getDoc,
   arrayUnion } from 'firebase/firestore';
 
 export interface group {
@@ -26,6 +27,59 @@ export interface expense {
 }
 
 const db = getFirestore(app);
+
+export async function getGroupWithChildren(groupId: string) {
+  try {
+    const groupRef = doc(db, "groups", groupId);
+    const groupSnap = await getDoc(groupRef);
+
+    if (!groupSnap.exists()) {
+      throw new Error("Group not found");
+    }
+
+    const groupData = groupSnap.data();
+    const members = groupData.members || [];
+
+    // Fetch all members and their expenses
+    const membersWithExpenses = await Promise.all(
+      members.map(async (member: member) => {
+        const memberRef = doc(db, "members", member.id);
+        const memberSnap = await getDoc(memberRef);
+
+        if (!memberSnap.exists()) {
+          throw new Error(`Member with ID ${member.id} not found`);
+        }
+
+        const memberData = memberSnap.data();
+        const expenses = memberData.expenses || [];
+
+        return {
+          ...memberData,
+          expenses: await Promise.all(
+            expenses.map(async (expense: expense) => {
+              const expenseRef = doc(db, "expenses", expense.id);
+              const expenseSnap = await getDoc(expenseRef);
+
+              if (!expenseSnap.exists()) {
+                throw new Error(`Expense with ID ${expense.id} not found`);
+              }
+
+              return expenseSnap.data();
+            })
+          )
+        };
+      })
+    );
+
+    return {
+      ...groupData,
+      members: membersWithExpenses
+    };
+  } catch (e) {
+    console.error("Error fetching group with children: ", e);
+    throw e;
+  }
+}
 
 export async function createGroup(groupName: string) {
   try {

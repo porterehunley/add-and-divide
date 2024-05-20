@@ -1,11 +1,12 @@
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { ExpenseSection } from "@/components/ui/expenseSection";
+import '../../app/globals.css';
 
 export default function Home() {
   return (
     <main className="flex flex-col items-center justify-center h-screen bg-[#f0f0f5] dark:bg-[#1a1a2e]">
-      <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-lg dark:bg-[#2c2c54]">
+      <div className="w-full h-full max-w-md p-6 bg-white rounded-lg shadow-lg dark:bg-[#2c2c54]">
         <h1 className="text-2xl font-bold mb-4 text-center text-[#6b5b95]">Expense Tracker</h1>
         <div className="space-y-4">
           <div className="space-y-2">
