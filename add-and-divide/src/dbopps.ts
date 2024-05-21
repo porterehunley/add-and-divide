@@ -11,7 +11,7 @@ import {
 export interface group {
   id: string,
   name: string,
-  memebers?: member[]
+  members?: member[]
 }
 
 export interface member {
@@ -28,7 +28,7 @@ export interface expense {
 
 const db = getFirestore(app);
 
-export async function getGroupWithChildren(groupId: string) {
+export async function getGroupWithChildren(groupId: string): Promise<group> {
   try {
     const groupRef = doc(db, "groups", groupId);
     const groupSnap = await getDoc(groupRef);
@@ -37,11 +37,12 @@ export async function getGroupWithChildren(groupId: string) {
       throw new Error("Group not found");
     }
 
-    const groupData = groupSnap.data();
+    const groupData = groupSnap.data() as group;
     const members = groupData.members || [];
+    console.log(members);
 
     // Fetch all members and their expenses
-    const membersWithExpenses = await Promise.all(
+    const membersWithExpenses: member[] = await Promise.all(
       members.map(async (member: member) => {
         const memberRef = doc(db, "members", member.id);
         const memberSnap = await getDoc(memberRef);
@@ -50,7 +51,7 @@ export async function getGroupWithChildren(groupId: string) {
           throw new Error(`Member with ID ${member.id} not found`);
         }
 
-        const memberData = memberSnap.data();
+        const memberData = memberSnap.data() as member;
         const expenses = memberData.expenses || [];
 
         return {
@@ -64,7 +65,7 @@ export async function getGroupWithChildren(groupId: string) {
                 throw new Error(`Expense with ID ${expense.id} not found`);
               }
 
-              return expenseSnap.data();
+              return expenseSnap.data() as expense;
             })
           )
         };
@@ -94,13 +95,14 @@ export async function createGroup(groupName: string) {
   }
 }
 
-export async function addMemberToGroup(groupId: string, member: member) {
+export async function addMemberToGroup(groupId: string, memberName: string): Promise<member> {
   try {
     const groupRef = doc(db, "groups", groupId);
-    await updateDoc(groupRef, {
-      members: arrayUnion(member)
+    const newMemberRef = await addDoc(collection(groupRef, "members"), {
+      name: memberName,
     });
-    console.log(`Member ${member.name} added to group with ID: ${groupId}`);
+    console.log(`Member ${memberName} added to group with ID: ${groupId}`);
+    return { id: newMemberRef.id, name: memberName };
   } catch (e) {
     console.error("Error adding member to group: ", e);
     throw e;
