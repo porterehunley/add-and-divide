@@ -5,6 +5,7 @@ import {
   getFirestore,
   doc,
   updateDoc,
+  getDocs,
   getDoc,
   arrayUnion } from 'firebase/firestore';
 
@@ -38,43 +39,24 @@ export async function getGroupWithChildren(groupId: string): Promise<group> {
     }
 
     const groupData = groupSnap.data() as group;
-    const members = groupData.members || [];
-    console.log(members);
-
-    // Fetch all members and their expenses
-    const membersWithExpenses: member[] = await Promise.all(
-      members.map(async (member: member) => {
-        const memberRef = doc(db, "members", member.id);
-        const memberSnap = await getDoc(memberRef);
-
-        if (!memberSnap.exists()) {
-          throw new Error(`Member with ID ${member.id} not found`);
-        }
-
-        const memberData = memberSnap.data() as member;
-        const expenses = memberData.expenses || [];
-
+    const membersCollectionRef = collection(groupRef, "members");
+    const membersSnap = await getDocs(membersCollectionRef);
+    const members = await Promise.all(
+      membersSnap.docs.map(async (memberDoc) => {
+        const memberData = memberDoc.data() as member;
+        const expensesCollectionRef = collection(memberDoc.ref, "expenses");
+        const expensesSnap = await getDocs(expensesCollectionRef);
+        const expenses = expensesSnap.docs.map(expenseDoc => expenseDoc.data() as expense);
         return {
           ...memberData,
-          expenses: await Promise.all(
-            expenses.map(async (expense: expense) => {
-              const expenseRef = doc(db, "expenses", expense.id);
-              const expenseSnap = await getDoc(expenseRef);
-
-              if (!expenseSnap.exists()) {
-                throw new Error(`Expense with ID ${expense.id} not found`);
-              }
-
-              return expenseSnap.data() as expense;
-            })
-          )
+          expenses
         };
       })
     );
 
     return {
       ...groupData,
-      members: membersWithExpenses
+      members
     };
   } catch (e) {
     console.error("Error fetching group with children: ", e);
