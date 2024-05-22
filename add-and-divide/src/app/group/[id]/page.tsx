@@ -7,6 +7,7 @@ import BaseModal from '@/components/BaseModal';
 import { ExpenseSection } from "@/components/ui/expenseSection";
 import { getGroupWithChildren, group, addMemberToGroup, member} from '@/dbopps';
 import MemberSelection from '@/components/MemberSelection';
+import { CurrencyInput } from '@/components/ui/currencyInput';
 import '@/app/globals.css';
 
 export default function Group({ params }: { params: { id: string } }) {
@@ -15,6 +16,7 @@ export default function Group({ params }: { params: { id: string } }) {
   const [showMemberSelection, setShowMemberSelection] = useState<boolean>(false);
   const [newMemberName, setNewMemberName] = useState<string>('');
   const [selectedMember, setSelectedMember] = useState<member>();
+  const [expenseAmmount, setExpenseAmmount] = useState<number>();
 
   const getGroupData = async () => {
     const data = await getGroupWithChildren(groupId);
@@ -78,14 +80,23 @@ export default function Group({ params }: { params: { id: string } }) {
           </div>
           <div className="border-t border-[#e6e6e6] dark:border-[#3c3c58] pt-4">
             <form className="space-y-4">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-col">
                 <Input
                   className="flex-1 border-[#e6e6e6] dark:border-[#3c3c58] 
                     bg-[#f0f0f5] dark:bg-[#2c2c54] text-[#6b5b95]"
-                  placeholder="Add Expense"
+                  placeholder="Expense Name"
                   type="text"
                 />
-                <Button className="bg-[#9370db] hover:bg-[#8258fa] text-white">Add</Button>
+                <div className='w-full justify-between flex'>
+                  <CurrencyInput
+                    // className="w-200 border-[#e6e6e6] dark:border-[#3c3c58] 
+                    //   bg-[#f0f0f5] dark:bg-[#2c2c54] text-[#6b5b95]"
+                    // placeholder="Ammount"
+                    // type="number"
+                    setValue={setExpenseAmmount}
+                  />
+                  <Button className="bg-[#9370db] hover:bg-[#8258fa] text-white">Add</Button>
+                </div>
               </div>
             </form>
           </div>
@@ -100,9 +111,9 @@ export default function Group({ params }: { params: { id: string } }) {
           <MemberSelection 
             members={groupData?.members || []}
             setSelectedMember={(member: member) => {setSelectedMember(member); setShowMemberSelection(false);}}/>
-          <div className="flex items-center gap-2 w-full pt-4">
+          <div className="flex items-center gap-2 w-full pt-4 flex-col" >
             <Input
-              className="flex-1 border-[#e6e6e6] dark:border-[#3c3c58] bg-[#f0f0f5] dark:bg-[#2c2c54] text-[#6b5b95]"
+              className="border-[#e6e6e6] dark:border-[#3c3c58] bg-[#f0f0f5] dark:bg-[#2c2c54] text-[#6b5b95]"
               placeholder="Add Member"
               type="text"
               value={newMemberName}
