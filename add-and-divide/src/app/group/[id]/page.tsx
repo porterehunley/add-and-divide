@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import BaseModal from '@/components/BaseModal';
@@ -55,7 +55,7 @@ export default function Group({ params }: { params: { id: string } }) {
             dark:bg-[#2c2c54] p-2 rounded-lg flex align-center
             justify-between cursor-pointer"
             onClick={() => setShowMemberSelection(true)}>
-            <p className="text-2m text-left text-[#6b5b95]">
+            <p className="text-m text-left text-[#6b5b95]">
               {selectedMember ? selectedMember.name : 'Select Member'}
             </p>
             <svg
@@ -80,7 +80,8 @@ export default function Group({ params }: { params: { id: string } }) {
             <form className="space-y-4">
               <div className="flex items-center gap-2">
                 <Input
-                  className="flex-1 border-[#e6e6e6] dark:border-[#3c3c58] bg-[#f0f0f5] dark:bg-[#2c2c54] text-[#6b5b95]"
+                  className="flex-1 border-[#e6e6e6] dark:border-[#3c3c58] 
+                    bg-[#f0f0f5] dark:bg-[#2c2c54] text-[#6b5b95]"
                   placeholder="Add Expense"
                   type="text"
                 />
@@ -95,21 +96,25 @@ export default function Group({ params }: { params: { id: string } }) {
         isOpen={showMemberSelection}
         title={"Who are you?"}
         onRequestClose={() => setShowMemberSelection(false)}>
-        <div className="flex items-center gap-2">
-          <MemberSelection members={groupData?.members || []}/>
-          <Input
-            className="flex-1 border-[#e6e6e6] dark:border-[#3c3c58] bg-[#f0f0f5] dark:bg-[#2c2c54] text-[#6b5b95]"
-            placeholder="Add Member"
-            type="text"
-            value={newMemberName}
-            onChange={(e) => setNewMemberName(e.target.value)}
-          />
-          <Button 
-            onClick={()=>addNewMemberClick(newMemberName)}
-            disabled={!newMemberName.trim()}
-            className="bg-[#9370db] hover:bg-[#8258fa] text-white">
-            Add
-          </Button>
+        <div className="flex items-center gap-2 flex-col">
+          <MemberSelection 
+            members={groupData?.members || []}
+            setSelectedMember={(member: member) => {setSelectedMember(member); setShowMemberSelection(false);}}/>
+          <div className="flex items-center gap-2 w-full pt-4">
+            <Input
+              className="flex-1 border-[#e6e6e6] dark:border-[#3c3c58] bg-[#f0f0f5] dark:bg-[#2c2c54] text-[#6b5b95]"
+              placeholder="Add Member"
+              type="text"
+              value={newMemberName}
+              onChange={(e) => setNewMemberName(e.target.value)}
+            />
+            <Button 
+              onClick={()=>addNewMemberClick(newMemberName)}
+              disabled={!newMemberName.trim()}
+              className="bg-[#9370db] hover:bg-[#8258fa] text-white">
+              Add
+            </Button>
+          </div>
         </div>
       </BaseModal>
     </main>

@@ -20,7 +20,10 @@ export default function BaseModal({ isOpen, onRequestClose, title, children }: B
       overlayClassName="Overlay"
     >
       <div className="modal-content flex flex-col">
-        <div className='width-full'>
+        <div className='width-full flex justify-between align-middle'>
+          <h1 className="text-xl font-bold text-center text-[#6b5b95]">
+            {title}
+          </h1>
           <button 
             className="float-right text-[#6b5b95] text-3xl"
             onClick={onRequestClose}
