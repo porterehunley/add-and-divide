@@ -136,6 +136,7 @@ export default function Group({ params }: { params: { id: string } }) {
                     step={10}
                   />
                   <Button
+                    disabled={!expenseName?.trim() || !selectedMember?.id || !expenseAmmount}
                     onClick={(e) => addExpenseClick(e)}
                     className="bg-[#9370db] hover:bg-[#8258fa] text-white">Add</Button>
                 </div>
