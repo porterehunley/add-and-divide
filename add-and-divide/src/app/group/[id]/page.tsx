@@ -5,9 +5,16 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import BaseModal from '@/components/BaseModal';
 import { ExpenseSection } from "@/components/ui/expenseSection";
-import { getGroupWithChildren, group, addMemberToGroup, member} from '@/dbopps';
+import { 
+  getGroupWithChildren,
+  group,
+  addMemberToGroup,
+  addExpenseToMember,
+  expense,
+  member
+} from '@/dbopps';
 import MemberSelection from '@/components/MemberSelection';
-import { CurrencyInput } from '@/components/ui/currencyInput';
+import CurrencyInput from 'react-currency-input-field';
 import '@/app/globals.css';
 
 export default function Group({ params }: { params: { id: string } }) {
@@ -17,6 +24,7 @@ export default function Group({ params }: { params: { id: string } }) {
   const [newMemberName, setNewMemberName] = useState<string>('');
   const [selectedMember, setSelectedMember] = useState<member>();
   const [expenseAmmount, setExpenseAmmount] = useState<number>();
+  const [expenseName, setExpenseName] = useState<string>();
 
   const getGroupData = async () => {
     const data = await getGroupWithChildren(groupId);
@@ -25,6 +33,31 @@ export default function Group({ params }: { params: { id: string } }) {
     }
     setGroupData(data);
   };
+
+  const validateValue = (value: string | undefined): void => {
+    const rawValue = value === undefined ? 'undefined' : value;
+    if (Number.isNaN(rawValue)) {
+      return;
+    }
+
+    setExpenseAmmount(Number(rawValue));
+  }
+
+  const addExpenseClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    const memberId = selectedMember?.id;
+    if (!expenseName || !expenseAmmount || !memberId) {
+      console.log("data not set");
+      return
+    }
+
+    const expense: expense = {
+      title: expenseName,
+      ammount: expenseAmmount
+    }
+
+    await addExpenseToMember(groupId, memberId, expense);
+  }
 
   const addNewMemberClick = async (name: string) => {
     if (groupData === undefined) {
@@ -85,17 +118,26 @@ export default function Group({ params }: { params: { id: string } }) {
                   className="flex-1 border-[#e6e6e6] dark:border-[#3c3c58] 
                     bg-[#f0f0f5] dark:bg-[#2c2c54] text-[#6b5b95]"
                   placeholder="Expense Name"
+                  value={expenseName}
+                  onChange={(e) => setExpenseName(e.target.value)}
                   type="text"
                 />
                 <div className='w-full justify-between flex'>
-                  <CurrencyInput
-                    // className="w-200 border-[#e6e6e6] dark:border-[#3c3c58] 
-                    //   bg-[#f0f0f5] dark:bg-[#2c2c54] text-[#6b5b95]"
-                    // placeholder="Ammount"
-                    // type="number"
-                    setValue={setExpenseAmmount}
+                  <CurrencyInput 
+                    placeholder="$42"
+                    allowDecimals={false}
+                    onValueChange={validateValue}
+                    className='border border-[#e6e6e6] dark:border-[#3c3c58] 
+                    bg-[#f0f0f5] dark:bg-[#2c2c54] text-[#6b5b95] px-3 py-2
+                    rounded-md h-10 focus-visible:ring-2 focus-visible:ring-gray-950
+                    ring-offset-white focus-visible:outline-none text-sm
+                    focus-visible:ring-offset-2 placeholder:text-gray-400'
+                    prefix={'$'}
+                    step={10}
                   />
-                  <Button className="bg-[#9370db] hover:bg-[#8258fa] text-white">Add</Button>
+                  <Button
+                    onClick={(e) => addExpenseClick(e)}
+                    className="bg-[#9370db] hover:bg-[#8258fa] text-white">Add</Button>
                 </div>
               </div>
             </form>

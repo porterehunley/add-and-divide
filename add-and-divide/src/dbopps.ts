@@ -10,24 +10,40 @@ import {
   arrayUnion } from 'firebase/firestore';
 
 export interface group {
-  id: string,
+  id?: string,
   name: string,
   members?: member[]
 }
 
 export interface member {
-  id: string,
+  id?: string,
   name: string,
   expenses?: expense[]
 }
 
 export interface expense {
-  id: string,
+  id?: string,
   ammount: number,
   title: string
 }
 
 const db = getFirestore(app);
+
+export async function addExpenseToMember(
+  groupId: string,
+  memberId: string,
+  expense: expense): Promise<void> {
+  try {
+    const memberRef = doc(db, "groups", groupId, "members", memberId);
+    const expenseRef = collection(memberRef, "expenses");
+    await addDoc(expenseRef, expense);
+    console.log(`Expense added to member ${memberId} in group ${groupId}`);
+  } catch (e) {
+    console.error("Error adding expense to member: ", e);
+    throw e;
+  }
+}
+
 
 export async function getGroupWithChildren(groupId: string): Promise<group> {
   try {
@@ -43,7 +59,7 @@ export async function getGroupWithChildren(groupId: string): Promise<group> {
     const membersSnap = await getDocs(membersCollectionRef);
     const members = await Promise.all(
       membersSnap.docs.map(async (memberDoc) => {
-        const memberData = memberDoc.data() as member;
+        const memberData = {id: memberDoc.id, ...memberDoc.data()} as member;
         const expensesCollectionRef = collection(memberDoc.ref, "expenses");
         const expensesSnap = await getDocs(expensesCollectionRef);
         const expenses = expensesSnap.docs.map(expenseDoc => expenseDoc.data() as expense);
