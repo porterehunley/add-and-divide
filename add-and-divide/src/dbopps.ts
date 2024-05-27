@@ -4,10 +4,8 @@ import {
   collection, 
   getFirestore,
   doc,
-  updateDoc,
   getDocs,
-  getDoc,
-  arrayUnion } from 'firebase/firestore';
+  getDoc } from 'firebase/firestore';
 
 export interface group {
   id?: string,

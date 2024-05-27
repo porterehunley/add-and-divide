@@ -22,8 +22,7 @@ export default function Group({ params }: { params: { id: string } }) {
   const [showMemberSelection, setShowMemberSelection] = useState<boolean>(false);
   const [newMemberName, setNewMemberName] = useState<string>('');
   const [selectedMember, setSelectedMember] = useState<member>();
-  const [expenseAmmount, setExpenseAmmount] = useState<number>();
-  const [expenseName, setExpenseName] = useState<string>();
+  const [sumTotal, setSumTotal] = useState<number>(0);
 
   const getGroupData = async () => {
     const data = await getGroupWithChildren(groupId);
@@ -32,7 +31,6 @@ export default function Group({ params }: { params: { id: string } }) {
     }
     setGroupData(data);
   };
-
 
   const addNewMemberClick = async (name: string) => {
     if (groupData === undefined) {
@@ -47,6 +45,16 @@ export default function Group({ params }: { params: { id: string } }) {
     };
     setGroupData(updatedGroupData);
   }
+
+  useEffect(() => {
+    const expenseTotal = groupData?.members?.flatMap(
+      member => member.expenses
+    ).map(
+      expense => expense?.ammount ?? 0
+    )?.reduce((prev, curr) => (prev+curr), 0);
+
+    setSumTotal(expenseTotal);
+  }, [groupData])
 
   useEffect(() => {
     if (groupId) {
@@ -88,6 +96,12 @@ export default function Group({ params }: { params: { id: string } }) {
             </svg>
           </div>
           <div className="space-y-2">
+            {groupData?.members?.map(member => (
+              <ExpenseSection
+                key={member.name}
+                member={member}
+                splitTotal={sumTotal / (groupData?.members?.length ?? 1)}/>
+            ))}
           </div>
           <div className="border-t border-[#e6e6e6] dark:border-[#3c3c58] pt-4">
             <ExpenseAdd 
@@ -105,7 +119,10 @@ export default function Group({ params }: { params: { id: string } }) {
         <div className="flex items-center gap-2 flex-col">
           <MemberSelection 
             members={groupData?.members || []}
-            setSelectedMember={(member: member) => {setSelectedMember(member); setShowMemberSelection(false);}}/>
+            setSelectedMember={(member: member) => {
+              setSelectedMember(member);
+              setShowMemberSelection(false);
+            }}/>
           <div className="flex items-center gap-2 w-full pt-4 flex-col" >
             <Input
               className="border-[#e6e6e6] dark:border-[#3c3c58] bg-[#f0f0f5] dark:bg-[#2c2c54] text-[#6b5b95]"
