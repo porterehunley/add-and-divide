@@ -44,6 +44,9 @@ export default function ExpenseAdd({
     }
     setIsLoading(true);
     await addExpenseToMember(groupId, memberId, expense);
+    if (onExpenseAdd) {
+      onExpenseAdd(expense);
+    }
     setIsLoading(false);
     setRawCurrInput('');
     setExpenseName('');

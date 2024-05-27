@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, memo } from 'react';
+import { useState, useEffect } from 'react';
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import BaseModal from '@/components/BaseModal';
@@ -9,7 +9,8 @@ import {
   getGroupWithChildren,
   group,
   addMemberToGroup,
-  member
+  member,
+  expense
 } from '@/dbopps';
 import ExpenseAdd from '@/components/ExpenseAdd';
 import MemberSelection from '@/components/MemberSelection';
@@ -32,6 +33,23 @@ export default function Group({ params }: { params: { id: string } }) {
     setGroupData(data);
   };
 
+  const addExpenseToGroupData = async (expense: expense) => {
+    if (!selectedMember || !groupData?.name) {
+      return 
+    }
+
+    const updatedGroupData = { 
+      ...groupData, 
+      members: groupData?.members?.map(member => 
+        member.id === selectedMember.id 
+          ? { ...member, expenses: [...(member.expenses || []), expense] } 
+          : member
+      ) 
+    };
+
+    setGroupData(updatedGroupData);
+  }
+
   const addNewMemberClick = async (name: string) => {
     if (groupData === undefined) {
       return
@@ -53,7 +71,7 @@ export default function Group({ params }: { params: { id: string } }) {
       expense => expense?.ammount ?? 0
     )?.reduce((prev, curr) => (prev+curr), 0);
 
-    setSumTotal(expenseTotal);
+    setSumTotal(expenseTotal ?? 0);
   }, [groupData])
 
   useEffect(() => {
@@ -107,6 +125,7 @@ export default function Group({ params }: { params: { id: string } }) {
             <ExpenseAdd 
               groupId={groupId}
               memberId={selectedMember?.id}
+              onExpenseAdd={addExpenseToGroupData}
             />
           </div>
         </div>

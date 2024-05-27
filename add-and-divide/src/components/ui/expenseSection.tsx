@@ -17,6 +17,7 @@ export function ExpenseSection(
           `${getMemeberTotal(member) - splitTotal > 0 ? '+' : '-'}$${Math.abs(getMemeberTotal(member) - splitTotal)}`
         }</span>
       </h2>
+
       <div className='flex flex-col'>
         {member.expenses?.map(expense => (
           <LineItem 
