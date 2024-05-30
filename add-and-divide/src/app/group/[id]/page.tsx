@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense, lazy } from 'react';
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import BaseModal from '@/components/BaseModal';
-import { ExpenseSection } from "@/components/ui/expenseSection";
+const ExpenseSection = lazy(() => import("@/components/ui/expenseSection"));
 import { 
   getGroupWithChildren,
   group,
@@ -115,6 +115,7 @@ export default function Group({ params }: { params: { id: string } }) {
         </div>
 
         <div className="space-y-2 overflow-scroll">
+          <Suspense fallback={<p>llLoading...</p>}>
           {groupData?.members?.map((member, idx) => (
             <ExpenseSection
               key={member.name}
@@ -124,6 +125,7 @@ export default function Group({ params }: { params: { id: string } }) {
               member={member}
               splitTotal={sumTotal / (groupData?.members?.length ?? 1)}/>
           ))}
+          </Suspense>
         </div>
 
         <div className="border-t mt-auto border-[#e6e6e6] dark:border-[#3c3c58] pt-4">

@@ -6,7 +6,7 @@ const getMemeberTotal = (member: member) => {
   return member.expenses?.reduce((total, exp) => total + exp.ammount, 0) ?? 0;
 }
 
-export function ExpenseSection(
+export default function ExpenseSection(
   { member, splitTotal, style }: { member: member, splitTotal: number, style?: React.CSSProperties }
 ) {
 
