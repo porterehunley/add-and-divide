@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import BaseModal from '@/components/BaseModal';
@@ -84,50 +84,54 @@ export default function Group({ params }: { params: { id: string } }) {
       h-screen bg-[#f0f0f5] dark:bg-[#1a1a2e]">
       <div className="w-full flex flex-col h-screen max-w-md p-6 bg-white rounded-lg 
         shadow-lg dark:bg-[#2c2c54]">
-        <h1 className="text-2xl font-bold mb-4 text-center 
-          text-[#6b5b95]">{groupData?.name}</h1>
-        <div className="
-          space-y-2 border-2 border-[#e6e6e6] mb-4 
-          dark:border-[#3c3c58] bg-[#f0f0f5] 
-          dark:bg-[#2c2c54] p-2 rounded-lg flex align-center
-          justify-between cursor-pointer"
-          onClick={() => setShowMemberSelection(true)}>
-          <p className="text-m text-left text-[#6b5b95]">
-            {selectedMember ? selectedMember.name : 'Select Member'}
-          </p>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6 text-[#6b5b95] cursor-pointer"
-            style={{ marginTop: 0 }}
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M19 9l-7 7-7-7"
-            />
-          </svg>
+        <div className='shrink-0'>
+          <h1 className="text-2xl font-bold mb-4 text-center 
+            text-[#6b5b95]">{groupData?.name}</h1>
+          <div className="
+            space-y-2 border-2 border-[#e6e6e6] mb-4 
+            dark:border-[#3c3c58] bg-[#f0f0f5] 
+            dark:bg-[#2c2c54] p-2 rounded-lg flex align-center
+            justify-between cursor-pointer"
+            onClick={() => setShowMemberSelection(true)}>
+            <p className="text-m text-left text-[#6b5b95]">
+              {selectedMember ? selectedMember.name : 'Select Member'}
+            </p>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6 text-[#6b5b95] cursor-pointer"
+              style={{ marginTop: 0 }}
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </div>
         </div>
-        <div className="space-y-4 flex-grow flex flex-col justify-between">
-          <div className="space-y-2">
-            {groupData?.members?.map(member => (
-              <ExpenseSection
-                key={member.name}
-                member={member}
-                splitTotal={sumTotal / (groupData?.members?.length ?? 1)}/>
-            ))}
-          </div>
 
-          <div className="border-t border-[#e6e6e6] dark:border-[#3c3c58] pt-4">
-            <ExpenseAdd 
-              groupId={groupId}
-              memberId={selectedMember?.id}
-              onExpenseAdd={addExpenseToGroupData}
-            />
-          </div>
+        <div className="space-y-2 overflow-scroll">
+          {groupData?.members?.map((member, idx) => (
+            <ExpenseSection
+              key={member.name}
+              style={
+                idx+1 === groupData?.members?.length ? {'border': 'none'} : {}
+              }
+              member={member}
+              splitTotal={sumTotal / (groupData?.members?.length ?? 1)}/>
+          ))}
+        </div>
+
+        <div className="border-t mt-auto border-[#e6e6e6] dark:border-[#3c3c58] pt-4">
+          <ExpenseAdd 
+            groupId={groupId}
+            memberId={selectedMember?.id}
+            onExpenseAdd={addExpenseToGroupData}
+          />
         </div>
       </div>
 

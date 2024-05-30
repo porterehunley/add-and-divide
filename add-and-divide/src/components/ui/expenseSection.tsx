@@ -7,11 +7,11 @@ const getMemeberTotal = (member: member) => {
 }
 
 export function ExpenseSection(
-  { member, splitTotal }: { member: member, splitTotal: number }
+  { member, splitTotal, style }: { member: member, splitTotal: number, style?: React.CSSProperties }
 ) {
 
   return (
-    <div className="border-b border-[#e6e6e6] dark:border-[#3c3c58] pb-4">
+    <div className="border-b border-[#e6e6e6] dark:border-[#3c3c58] pb-4" style={style}>
       <h2 className="font-medium text-[#6b5b95]">
         {member.name} <span className="text-[#9370db] font-bold">{
           `${getMemeberTotal(member) - splitTotal > 0 ? '+' : '-'}$${Math.abs(getMemeberTotal(member) - splitTotal)}`
