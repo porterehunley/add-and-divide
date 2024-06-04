@@ -4,7 +4,6 @@ import { useState, useEffect, Suspense, lazy } from 'react';
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import BaseModal from '@/components/BaseModal';
-const ExpenseSection = lazy(() => import("@/components/ui/expenseSection"));
 import { 
   getGroupWithChildren,
   group,
@@ -15,6 +14,8 @@ import {
 import ExpenseAdd from '@/components/ExpenseAdd';
 import MemberSelection from '@/components/MemberSelection';
 import '@/app/globals.css';
+import ExpenseDeck from '@/components/ui/ExpenseDeck';
+import Skeleton from '@/components/ui/Skeleton';
 
 export default function Group({ params }: { params: { id: string } }) {
   const groupId = params.id;
@@ -85,8 +86,10 @@ export default function Group({ params }: { params: { id: string } }) {
       <div className="w-full flex flex-col h-screen max-w-md p-6 bg-white rounded-lg 
         shadow-lg dark:bg-[#2c2c54]">
         <div className='shrink-0'>
-          <h1 className="text-2xl font-bold mb-4 text-center 
-            text-[#6b5b95]">{groupData?.name}</h1>
+          {groupData?.name ? <h1 className="text-2xl font-bold mb-4 text-center 
+            text-[#6b5b95]">{groupData?.name}</h1> :
+            <Skeleton style={{height: 40, marginBottom: 8}}/>}
+          
           <div className="
             space-y-2 border-2 border-[#e6e6e6] mb-4 
             dark:border-[#3c3c58] bg-[#f0f0f5] 
@@ -115,17 +118,9 @@ export default function Group({ params }: { params: { id: string } }) {
         </div>
 
         <div className="space-y-2 overflow-scroll">
-          <Suspense fallback={<p>llLoading...</p>}>
-          {groupData?.members?.map((member, idx) => (
-            <ExpenseSection
-              key={member.name}
-              style={
-                idx+1 === groupData?.members?.length ? {'border': 'none'} : {}
-              }
-              member={member}
-              splitTotal={sumTotal / (groupData?.members?.length ?? 1)}/>
-          ))}
-          </Suspense>
+          <ExpenseDeck 
+            members={groupData?.members}
+            splitTotal={sumTotal / (groupData?.members?.length ?? 1)}/>
         </div>
 
         <div className="border-t mt-auto border-[#e6e6e6] dark:border-[#3c3c58] pt-4">
