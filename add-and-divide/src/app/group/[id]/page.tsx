@@ -16,6 +16,7 @@ import MemberSelection from '@/components/MemberSelection';
 import '@/app/globals.css';
 import ExpenseDeck from '@/components/ui/ExpenseDeck';
 import Skeleton from '@/components/ui/Skeleton';
+import HomeIcon from '@/components/ui/HomeIcon';
 
 export default function Group({ params }: { params: { id: string } }) {
   const groupId = params.id;
@@ -86,9 +87,16 @@ export default function Group({ params }: { params: { id: string } }) {
       <div className="w-full flex flex-col h-screen max-w-md p-6 bg-white rounded-lg 
         shadow-lg dark:bg-[#2c2c54]">
         <div className='shrink-0'>
-          {groupData?.name ? <h1 className="text-2xl font-bold mb-4 text-center 
-            text-[#6b5b95]">{groupData?.name}</h1> :
-            <Skeleton style={{height: 40, marginBottom: 8}}/>}
+          <div className='flex-row flex justify-between items-center mb-4'>
+            <HomeIcon className='h-7 w-7 mr-4'/>
+            {groupData?.name ? 
+              <div className='max-w-80'>
+                <h1 className="text-2xl font-bold 
+              text-[#6b5b95]">{groupData?.name}
+                </h1>
+              </div> :
+              <Skeleton style={{height: 40, width: '100%', marginBottom: 8}}/>}
+          </div>
           
           <div className="
             space-y-2 border-2 border-[#e6e6e6] mb-4 
