@@ -17,6 +17,7 @@ import '@/app/globals.css';
 import ExpenseDeck from '@/components/ui/ExpenseDeck';
 import Skeleton from '@/components/ui/Skeleton';
 import HomeIcon from '@/components/ui/HomeIcon';
+import { useRouter } from 'next/navigation';
 
 export default function Group({ params }: { params: { id: string } }) {
   const groupId = params.id;
@@ -25,6 +26,7 @@ export default function Group({ params }: { params: { id: string } }) {
   const [newMemberName, setNewMemberName] = useState<string>('');
   const [selectedMember, setSelectedMember] = useState<member>();
   const [sumTotal, setSumTotal] = useState<number>(0);
+  const router = useRouter();
 
   const getGroupData = async () => {
     const data = await getGroupWithChildren(groupId);
@@ -88,14 +90,14 @@ export default function Group({ params }: { params: { id: string } }) {
         shadow-lg dark:bg-[#2c2c54]">
         <div className='shrink-0'>
           <div className='flex-row flex justify-between items-center mb-4'>
-            <HomeIcon className='h-7 w-7 mr-4'/>
+            <HomeIcon className='h-7 w-7 mr-4' onClick={(e) => router.push('/newGroup')}/>
             {groupData?.name ? 
               <div className='max-w-80'>
                 <h1 className="text-2xl font-bold 
               text-[#6b5b95]">{groupData?.name}
                 </h1>
               </div> :
-              <Skeleton style={{height: 40, width: '100%', marginBottom: 8}}/>}
+              <Skeleton style={{height: 38, width: '100%' }}/>}
           </div>
           
           <div className="
