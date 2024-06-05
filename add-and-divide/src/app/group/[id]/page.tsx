@@ -8,6 +8,7 @@ import {
   getGroupWithChildren,
   group,
   addMemberToGroup,
+  addGroupRefToDeviceIfAbsent,
   member,
   expense
 } from '@/dbopps';
@@ -18,6 +19,7 @@ import ExpenseDeck from '@/components/ui/ExpenseDeck';
 import Skeleton from '@/components/ui/Skeleton';
 import HomeIcon from '@/components/ui/HomeIcon';
 import { useRouter } from 'next/navigation';
+import { getOrSetDeviceData } from '@/device';
 
 export default function Group({ params }: { params: { id: string } }) {
   const groupId = params.id;
@@ -33,6 +35,8 @@ export default function Group({ params }: { params: { id: string } }) {
     if (!data.members?.length) {
       setShowMemberSelection(true);
     }
+    const deviceId = getOrSetDeviceData();
+    addGroupRefToDeviceIfAbsent(deviceId, data.name, groupId);
     setGroupData(data);
   };
 

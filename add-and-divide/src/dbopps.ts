@@ -4,6 +4,9 @@ import {
   collection, 
   getFirestore,
   doc,
+  query,
+  where,
+  setDoc,
   getDocs,
   getDoc } from 'firebase/firestore';
 
@@ -25,7 +28,62 @@ export interface expense {
   title: string
 }
 
+export interface GroupReference {
+  id?: string,
+  groupId: string,
+  name: string
+}
+
 const db = getFirestore(app);
+
+export async function getDeviceGroups(deviceId: string): Promise<GroupReference[]> {
+  try {
+    const deviceRef = doc(db, "devices", deviceId);
+    const groupsCollectionRef = collection(deviceRef, "groups");
+    const groupsSnap = await getDocs(groupsCollectionRef);
+    const groupDataPromises = groupsSnap.docs.map(async (groupDoc) => {
+      const groupRef = doc(db, "groups", groupDoc.id);
+      const groupSnap = await getDoc(groupRef);
+      return { id: groupDoc.id, ...groupSnap.data() } as GroupReference;
+    });
+
+    const groupsData = await Promise.all(groupDataPromises);
+    console.log(groupsData);
+
+    return groupsData;
+  } catch (e) {
+    console.error("Error fetching device groups: ", e);
+    throw e;
+  }
+}
+
+export async function addGroupRefToDeviceIfAbsent(
+  deviceId: string, groupName: string, groupId: string): Promise<void> {
+  try {
+    const deviceRef = doc(db, "devices", deviceId);
+    const deviceSnap = await getDoc(deviceRef);
+    if (!deviceSnap.exists()) {
+      await setDoc(deviceRef, {});
+    }
+
+    const groupsCollectionRef = collection(deviceRef, "groups");
+    const existingGroupQuery = query(groupsCollectionRef, where("groupId", "==", groupId));
+    const existingGroupSnap = await getDocs(existingGroupQuery);
+    if (!existingGroupSnap.empty) {
+      console.log(`Group with id ${groupId} already exists for device ${deviceId}`);
+      return;
+    }
+
+    await addDoc(
+      groupsCollectionRef, 
+      { name: groupName, groupId: groupId }
+    );
+    console.log(`Group name ${groupName} added to device ${deviceId}`);
+  } catch (e) {
+    console.error("Error adding group name to device: ", e);
+    throw e;
+  }
+}
 
 export async function addExpenseToMember(
   groupId: string,
