@@ -3,6 +3,7 @@ import {
   addDoc, 
   collection, 
   getFirestore,
+  runTransaction,
   doc,
   query,
   where,
@@ -60,25 +61,24 @@ export async function getDeviceGroups(deviceId: string): Promise<GroupReference[
 export async function addGroupRefToDeviceIfAbsent(
   deviceId: string, groupName: string, groupId: string): Promise<void> {
   try {
-    const deviceRef = doc(db, "devices", deviceId);
-    const deviceSnap = await getDoc(deviceRef);
-    if (!deviceSnap.exists()) {
-      await setDoc(deviceRef, {});
-    }
+    await runTransaction(db, async (transaction) => {
+      const deviceRef = doc(db, "devices", deviceId);
+      const deviceSnap = await transaction.get(deviceRef);
+      if (!deviceSnap.exists()) {
+        transaction.set(deviceRef, {});
+      }
 
-    const groupsCollectionRef = collection(deviceRef, "groups");
-    const existingGroupQuery = query(groupsCollectionRef, where("groupId", "==", groupId));
-    const existingGroupSnap = await getDocs(existingGroupQuery);
-    if (!existingGroupSnap.empty) {
-      console.log(`Group with id ${groupId} already exists for device ${deviceId}`);
-      return;
-    }
+      const groupsCollectionRef = collection(deviceRef, "groups");
+      const existingGroupQuery = query(groupsCollectionRef, where("groupId", "==", groupId));
+      const existingGroupSnap = await getDocs(existingGroupQuery);
+      if (!existingGroupSnap.empty) {
+        console.log(`Group with id ${groupId} already exists for device ${deviceId}`);
+        return;
+      }
 
-    await addDoc(
-      groupsCollectionRef, 
-      { name: groupName, groupId: groupId }
-    );
-    console.log(`Group name ${groupName} added to device ${deviceId}`);
+      transaction.set(doc(groupsCollectionRef), { name: groupName, groupId: groupId });
+      console.log(`Group name ${groupName} added to device ${deviceId}`);
+    });
   } catch (e) {
     console.error("Error adding group name to device: ", e);
     throw e;
