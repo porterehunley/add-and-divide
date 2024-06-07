@@ -43,9 +43,7 @@ export async function getDeviceGroups(deviceId: string): Promise<GroupReference[
     const groupsCollectionRef = collection(deviceRef, "groups");
     const groupsSnap = await getDocs(groupsCollectionRef);
     const groupDataPromises = groupsSnap.docs.map(async (groupDoc) => {
-      const groupRef = doc(db, "groups", groupDoc.id);
-      const groupSnap = await getDoc(groupRef);
-      return { id: groupDoc.id, ...groupSnap.data() } as GroupReference;
+      return { id: groupDoc.id, ...groupDoc.data() } as GroupReference;
     });
 
     const groupsData = await Promise.all(groupDataPromises);

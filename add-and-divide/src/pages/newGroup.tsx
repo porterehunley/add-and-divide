@@ -1,14 +1,17 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from 'next/router'
 
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { createGroup } from "@/dbopps";
+import { GroupReference, createGroup } from "@/dbopps";
+import { getDeviceGroups } from "@/dbopps";
+import { getOrSetDeviceData } from "@/device";
 import '@/app/globals.css';
 
 
 export default function NewGroup() {
   const [groupName, setGroupName] = useState<string>('');
+  const [groupRefs, setGroupRefs] = useState<GroupReference[]>();
   const router = useRouter();
 
   const onCreateClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -16,6 +19,16 @@ export default function NewGroup() {
     const groupId = await createGroup(groupName);
     router.push(`/group/${groupId}`);
   };
+
+  const getGroupRefs = async (deviceId: string) => {
+    const refs = await getDeviceGroups(deviceId);
+    setGroupRefs(refs);
+  }
+
+  useEffect(() => {
+    const deviceId = getOrSetDeviceData();
+    getGroupRefs(deviceId);
+  }, []);
 
   return (
     <main className="flex flex-col items-center justify-center h-screen bg-[#f0f0f5] dark:bg-[#1a1a2e]">
@@ -25,6 +38,13 @@ export default function NewGroup() {
           <p className="text-lg text-center text-[#6b5b95]">
             A no-nonsense expense tracker for groups. Easy, free, and no overhead.
           </p>
+          <div>
+            {groupRefs?.map(groupRef => (
+              <div key={groupRef.name}>
+                <p>{groupRef.name}</p>
+              </div>
+            ))}
+          </div>
         </div>
         <div className="border-t border-[#e6e6e6] dark:border-[#3c3c58] pt-4 flex-shrink-0">
           <form className="space-y-4">
