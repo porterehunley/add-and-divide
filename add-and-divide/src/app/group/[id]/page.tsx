@@ -137,12 +137,18 @@ export default function Group({ params }: { params: { id: string } }) {
             splitTotal={sumTotal / (groupData?.members?.length ?? 1)}/>
         </div>
 
-        <div className="border-t mt-auto border-[#e6e6e6] dark:border-[#3c3c58] pt-4">
-          <ExpenseAdd 
-            groupId={groupId}
-            memberId={selectedMember?.id}
-            onExpenseAdd={addExpenseToGroupData}
-          />
+
+        <div className="mt-auto dark:border-[#3c3c58]">
+          <Button className='mb-4 w-full bg-[#9370db] hover:bg-[#8258fa] text-white'>
+          {'Settle Balance'}
+          </Button>
+          <div className='border-t border-[#e6e6e6] pt-4'>
+            <ExpenseAdd 
+              groupId={groupId}
+              memberId={selectedMember?.id}
+              onExpenseAdd={addExpenseToGroupData}
+            />
+          </div>
         </div>
       </div>
 
