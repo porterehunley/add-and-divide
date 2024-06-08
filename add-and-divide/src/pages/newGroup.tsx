@@ -7,6 +7,7 @@ import { GroupReference, createGroup } from "@/dbopps";
 import { getDeviceGroups } from "@/dbopps";
 import { getOrSetDeviceData } from "@/device";
 import '@/app/globals.css';
+import GroupsDeck from "@/components/ui/GroupsDeck";
 
 
 export default function NewGroup() {
@@ -34,16 +35,13 @@ export default function NewGroup() {
     <main className="flex flex-col items-center justify-center h-screen bg-[#f0f0f5] dark:bg-[#1a1a2e]">
       <div className="w-full h-full max-w-md p-6 bg-white rounded-lg shadow-lg dark:bg-[#2c2c54] flex flex-col">
         <h1 className="text-2xl font-bold mb-4 text-center text-[#6b5b95]">Add&Divide</h1>
-        <div className="space-y-2 flex-grow">
-          <p className="text-lg text-center text-[#6b5b95]">
+        <div className="space flex-grow">
+          <p className="text-md text-center text-[#6b5b95]">
             A no-nonsense expense tracker for groups. Easy, free, and no overhead.
           </p>
-          <div>
-            {groupRefs?.map(groupRef => (
-              <div key={groupRef.name}>
-                <p>{groupRef.name}</p>
-              </div>
-            ))}
+          <div className="mt-4 text-[#6b5b95] space-y-2">
+            <h2 className="text-md font-bold">Groups found on this device</h2>
+            <GroupsDeck groups={groupRefs}/>
           </div>
         </div>
         <div className="border-t border-[#e6e6e6] dark:border-[#3c3c58] pt-4 flex-shrink-0">

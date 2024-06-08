@@ -1,5 +1,6 @@
 import { GroupReference } from "@/dbopps";
 import Skeleton from '@/components/ui/Skeleton'
+import GroupSection from "./GroupSection";
 
 export interface GroupsDeckProps {
   groups?: GroupReference[],
@@ -17,7 +18,7 @@ export default function GroupsDeck({groups}: GroupsDeckProps) {
   return (
     <>
     {groups.map(groupRef => (
-      
+      <GroupSection key={groupRef.groupId} group={groupRef} />
     ))}
     </>
   );
