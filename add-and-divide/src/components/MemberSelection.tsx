@@ -1,5 +1,6 @@
 import '@/app/globals.css';
 import { member } from '@/dbopps';
+import RightChevronIcon from './ui/RigthChevronIcon';
 
 
 interface MemberSelectionProps {
@@ -20,21 +21,7 @@ export default function MemberSelection({ members, setSelectedMember }: MemberSe
           <p className="text-m text-left text-[#6b5b95]">
             {member.name}
           </p>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6 text-[#6b5b95] cursor-pointer"
-            style={{ marginTop: 0 }}
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M9 5l7 7-7 7"
-            />
-          </svg>
+          <RightChevronIcon className='h-6 w-6 text-[#6b5b95] cursor-pointer' />
         </li>
       ))}
     </ul>
