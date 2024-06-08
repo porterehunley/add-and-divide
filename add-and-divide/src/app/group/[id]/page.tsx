@@ -10,7 +10,8 @@ import {
   addMemberToGroup,
   addGroupRefToDeviceIfAbsent,
   member,
-  expense
+  expense,
+  markMemberAsSettled
 } from '@/dbopps';
 import ExpenseAdd from '@/components/ExpenseAdd';
 import MemberSelection from '@/components/MemberSelection';
@@ -68,6 +69,24 @@ export default function Group({ params }: { params: { id: string } }) {
       id: groupData?.id || groupId, // Ensure id is always a string
       members: [...(groupData?.members || []), newMember] 
     };
+    setGroupData(updatedGroupData);
+  }
+
+  const settleMemberClick = async () => {
+    if (!selectedMember?.id || !groupData?.name) {
+      return;
+    }
+
+    await markMemberAsSettled(groupId, selectedMember.id);
+    const updatedGroupData = { 
+      ...groupData, 
+      members: groupData?.members?.map(member => 
+        member.id === selectedMember.id 
+          ? { ...member, isSettled: true } 
+          : member
+      ) 
+    };
+
     setGroupData(updatedGroupData);
   }
 
@@ -139,7 +158,10 @@ export default function Group({ params }: { params: { id: string } }) {
 
 
         <div className="mt-auto dark:border-[#3c3c58]">
-          <Button className='mb-4 w-full bg-[#9370db] hover:bg-[#8258fa] text-white'>
+          <Button 
+            disabled={!selectedMember}
+            onClick={(e)=>settleMemberClick()}
+            className='mb-4 w-full bg-[#9370db] hover:bg-[#8258fa] text-white'>
           {'Settle Balance'}
           </Button>
           <div className='border-t border-[#e6e6e6] pt-4'>

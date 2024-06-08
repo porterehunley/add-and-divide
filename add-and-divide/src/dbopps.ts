@@ -1,6 +1,7 @@
 import { app } from '@/firebase';
 import { 
   addDoc, 
+  updateDoc,
   collection, 
   getFirestore,
   runTransaction,
@@ -20,6 +21,7 @@ export interface group {
 export interface member {
   id?: string,
   name: string,
+  isSettled?: boolean,
   expenses?: expense[]
 }
 
@@ -52,6 +54,17 @@ export async function getDeviceGroups(deviceId: string): Promise<GroupReference[
     return groupsData;
   } catch (e) {
     console.error("Error fetching device groups: ", e);
+    throw e;
+  }
+}
+
+export async function markMemberAsSettled(groupId: string, memberId: string): Promise<void> {
+  try {
+    const memberRef = doc(db, "groups", groupId, "members", memberId);
+    await updateDoc(memberRef, { isSettled: true });
+    console.log(`Member ${memberId} in group ${groupId} marked as settled.`);
+  } catch (e) {
+    console.error("Error marking member as settled: ", e);
     throw e;
   }
 }

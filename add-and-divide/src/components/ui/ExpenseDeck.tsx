@@ -35,6 +35,7 @@ export default function ExpenseDeck({
     {members.map((member, idx) => (
       <ExpenseSection
         key={member.name}
+        isComplete={member.isSettled ?? false}
         style={
           idx+1 === members.length ? {'border': 'none'} : {}
         }
