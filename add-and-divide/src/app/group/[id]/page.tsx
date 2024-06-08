@@ -29,6 +29,7 @@ export default function Group({ params }: { params: { id: string } }) {
   const [newMemberName, setNewMemberName] = useState<string>('');
   const [selectedMember, setSelectedMember] = useState<member>();
   const [sumTotal, setSumTotal] = useState<number>(0);
+  const [isSettling, setIsSettling] = useState<boolean>(false);
   const router = useRouter();
 
   const getGroupData = async () => {
@@ -76,7 +77,7 @@ export default function Group({ params }: { params: { id: string } }) {
     if (!selectedMember?.id || !groupData?.name) {
       return;
     }
-
+    setIsSettling(true);
     await markMemberAsSettled(groupId, selectedMember.id);
     const updatedGroupData = { 
       ...groupData, 
@@ -88,6 +89,7 @@ export default function Group({ params }: { params: { id: string } }) {
     };
 
     setGroupData(updatedGroupData);
+    setIsSettling(false);
   }
 
   useEffect(() => {
@@ -160,9 +162,10 @@ export default function Group({ params }: { params: { id: string } }) {
         <div className="mt-auto dark:border-[#3c3c58]">
           <Button 
             disabled={!selectedMember}
+            isLoading={isSettling}
             onClick={(e)=>settleMemberClick()}
             className='mb-4 w-full bg-[#9370db] hover:bg-[#8258fa] text-white'>
-          {'Settle Balance'}
+          {selectedMember?.isSettled ? 'Add More' : 'Settle Balance'}
           </Button>
           <div className='border-t border-[#e6e6e6] pt-4'>
             <ExpenseAdd 
