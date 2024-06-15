@@ -77,16 +77,15 @@ export default function Group({ params }: { params: { id: string } }) {
     setGroupData(updatedGroupData);
   }
 
-
-
   const settleMemberClick = async () => {
     if (!selectedMember?.id || !groupData?.name) {
       return;
     }
+
     setIsSettling(true);
     if (selectedMember?.isSettled) {
       await markMemberAsNotSettled(groupId, selectedMember.id);
-      const updatedGroupData = { 
+      let updatedGroupData = { 
         ...groupData, 
         members: groupData?.members?.map(member => 
           member.id === selectedMember.id 
@@ -103,6 +102,7 @@ export default function Group({ params }: { params: { id: string } }) {
 
       if (unsettledMembers?.length === 1) {
         await markGroupAsNotSettled(groupId);
+        updatedGroupData = {...updatedGroupData, isComplete: false};
       }
 
       setGroupData(updatedGroupData);
@@ -111,7 +111,7 @@ export default function Group({ params }: { params: { id: string } }) {
     }
 
     await markMemberAsSettled(groupId, selectedMember.id);
-    const updatedGroupData = { 
+    let updatedGroupData = { 
       ...groupData, 
       members: groupData?.members?.map(member => 
         member.id === selectedMember.id 
@@ -125,6 +125,7 @@ export default function Group({ params }: { params: { id: string } }) {
     );
     if (allMembersSettled) {
       await markGroupAsSettled(groupId);
+      updatedGroupData = {...updatedGroupData, isComplete: true};
     }
 
     setSelectedMember({...selectedMember, isSettled: true})
@@ -142,6 +143,10 @@ export default function Group({ params }: { params: { id: string } }) {
 
     setSumTotal(expenseTotal ?? 0);
   }, [groupData])
+
+  useEffect(() => {
+    setShowComplete(groupData?.isComplete ?? false);
+  }, [groupData?.isComplete])
 
   useEffect(() => {
     if (groupId) {
