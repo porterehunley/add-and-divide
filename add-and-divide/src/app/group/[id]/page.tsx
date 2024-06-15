@@ -11,7 +11,10 @@ import {
   addGroupRefToDeviceIfAbsent,
   member,
   expense,
-  markMemberAsSettled
+  markGroupAsSettled,
+  markMemberAsSettled,
+  markMemberAsNotSettled,
+  markGroupAsNotSettled
 } from '@/dbopps';
 import ExpenseAdd from '@/components/ExpenseAdd';
 import MemberSelection from '@/components/MemberSelection';
@@ -26,6 +29,7 @@ export default function Group({ params }: { params: { id: string } }) {
   const groupId = params.id;
   const [groupData, setGroupData] = useState<group>();
   const [showMemberSelection, setShowMemberSelection] = useState<boolean>(false);
+  const [showComplete, setShowComplete] = useState<boolean>(false);
   const [newMemberName, setNewMemberName] = useState<string>('');
   const [selectedMember, setSelectedMember] = useState<member>();
   const [sumTotal, setSumTotal] = useState<number>(0);
@@ -73,11 +77,39 @@ export default function Group({ params }: { params: { id: string } }) {
     setGroupData(updatedGroupData);
   }
 
+
+
   const settleMemberClick = async () => {
     if (!selectedMember?.id || !groupData?.name) {
       return;
     }
     setIsSettling(true);
+    if (selectedMember?.isSettled) {
+      await markMemberAsNotSettled(groupId, selectedMember.id);
+      const updatedGroupData = { 
+        ...groupData, 
+        members: groupData?.members?.map(member => 
+          member.id === selectedMember.id 
+            ? { ...member, isSettled: false } 
+            : member
+        ) 
+      };
+
+      setSelectedMember({...selectedMember, isSettled: false})
+
+      const unsettledMembers = updatedGroupData?.members?.filter(
+        member => !member.isSettled
+      );
+
+      if (unsettledMembers?.length === 1) {
+        await markGroupAsNotSettled(groupId);
+      }
+
+      setGroupData(updatedGroupData);
+      setIsSettling(false);
+      return;
+    }
+
     await markMemberAsSettled(groupId, selectedMember.id);
     const updatedGroupData = { 
       ...groupData, 
@@ -87,6 +119,15 @@ export default function Group({ params }: { params: { id: string } }) {
           : member
       ) 
     };
+
+    const allMembersSettled = updatedGroupData?.members?.every(
+      member => member.isSettled
+    );
+    if (allMembersSettled) {
+      await markGroupAsSettled(groupId);
+    }
+
+    setSelectedMember({...selectedMember, isSettled: true})
 
     setGroupData(updatedGroupData);
     setIsSettling(false);
@@ -204,6 +245,12 @@ export default function Group({ params }: { params: { id: string } }) {
             </Button>
           </div>
         </div>
+      </BaseModal>
+
+      <BaseModal
+        isOpen={showComplete}
+        onRequestClose={() => setShowComplete(false)}
+        title={'This group is complete'}>
       </BaseModal>
     </main>
   );

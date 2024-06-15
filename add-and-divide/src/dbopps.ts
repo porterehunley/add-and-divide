@@ -15,6 +15,7 @@ import {
 export interface group {
   id?: string,
   name: string,
+  isComplete?: boolean,
   members?: member[]
 }
 
@@ -65,6 +66,39 @@ export async function markMemberAsSettled(groupId: string, memberId: string): Pr
     console.log(`Member ${memberId} in group ${groupId} marked as settled.`);
   } catch (e) {
     console.error("Error marking member as settled: ", e);
+    throw e;
+  }
+}
+
+export async function markMemberAsNotSettled(groupId: string, memberId: string): Promise<void> {
+  try {
+    const memberRef = doc(db, "groups", groupId, "members", memberId);
+    await updateDoc(memberRef, { isSettled: false });
+    console.log(`Member ${memberId} in group ${groupId} marked as not settled.`);
+  } catch (e) {
+    console.error("Error marking member as not settled: ", e);
+    throw e;
+  }
+}
+
+export async function markGroupAsSettled(groupId: string): Promise<void> {
+  try {
+    const groupRef = doc(db, "groups", groupId);
+    await updateDoc(groupRef, { isComplete: true });
+    console.log(`Group ${groupId} marked as settled.`);
+  } catch (e) {
+    console.error("Error marking group as settled: ", e);
+    throw e;
+  }
+}
+
+export async function markGroupAsNotSettled(groupId: string): Promise<void> {
+  try {
+    const groupRef = doc(db, "groups", groupId);
+    await updateDoc(groupRef, { isComplete: false });
+    console.log(`Group ${groupId} marked as not settled.`);
+  } catch (e) {
+    console.error("Error marking group as not settled: ", e);
     throw e;
   }
 }
