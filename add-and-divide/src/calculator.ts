@@ -12,7 +12,7 @@ export function calculateNetBalances(members: member[]): { [key: string]: number
 
   members.forEach(member => {
     const totalExpenses = member.expenses?.reduce((sum, expense) => sum + expense.amount, 0);
-    balances[member.id] = totalExpenses ?? 0;
+    balances[member.name] = totalExpenses ?? 0;
   });
 
   const totalExpenses = Object.values(balances).reduce((sum, balance) => sum + balance, 0);

@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "test": "ts-node src/tests/calculatorTests.ts",
     "lint": "next lint"
   },
   "dependencies": {
@@ -13,6 +14,7 @@
     "@radix-ui/react-slot": "^1.0.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "d3": "^7.9.0",
     "firebase": "^10.12.0",
     "lucide-react": "^0.378.0",
     "next": "14.2.3",
@@ -35,6 +37,7 @@
     "eslint-config-next": "14.2.3",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
+    "ts-node": "^10.9.2",
     "typescript": "^5"
   }
 }

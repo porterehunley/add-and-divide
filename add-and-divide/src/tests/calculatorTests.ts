@@ -1,4 +1,5 @@
-import { minimizd}
+const { minimizeTransactions } = require("./calculator");
+const  { member } = require("./dbopps");
 
 const testCases = [
   {
