@@ -138,7 +138,7 @@ export default function Group({ params }: { params: { id: string } }) {
     const expenseTotal = groupData?.members?.flatMap(
       member => member.expenses
     ).map(
-      expense => expense?.ammount ?? 0
+      expense => expense?.amount ?? 0
     )?.reduce((prev, curr) => (prev+curr), 0);
 
     setSumTotal(expenseTotal ?? 0);
@@ -203,7 +203,6 @@ export default function Group({ params }: { params: { id: string } }) {
             members={groupData?.members}
             splitTotal={sumTotal / (groupData?.members?.length ?? 1)}/>
         </div>
-
 
         <div className="mt-auto dark:border-[#3c3c58]">
           <Button 

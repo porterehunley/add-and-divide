@@ -1,10 +1,9 @@
-import { useState, useEffect } from 'react';
 import { LineItem } from '@/components/ui/LineItem';
 import { member } from '@/dbopps';
 import Badge from './Badge';
 
 const getMemeberTotal = (member: member) => {
-  return member.expenses?.reduce((total, exp) => total + exp.ammount, 0) ?? 0;
+  return member.expenses?.reduce((total, exp) => total + exp.amount, 0) ?? 0;
 }
 
 export interface ExpenseSecionProps {
@@ -34,7 +33,7 @@ export default function ExpenseSection(
           <LineItem 
             key={expense.title}
             name={expense.title}
-            amount={expense.ammount}/>
+            amount={expense.amount}/>
         ))}
       </div>
     </div>

@@ -38,12 +38,13 @@ export default function ExpenseAdd({
       return
     }
 
-    const expense: expense = {
-      title: expenseName,
-      ammount: expenseAmmount
-    }
     setIsLoading(true);
-    await addExpenseToMember(groupId, memberId, expense);
+    const expense = await addExpenseToMember(
+      groupId,
+      memberId,
+      expenseAmmount,
+      expenseName);
+
     if (onExpenseAdd) {
       onExpenseAdd(expense);
     }

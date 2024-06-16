@@ -13,22 +13,22 @@ import {
   getDoc } from 'firebase/firestore';
 
 export interface group {
-  id?: string,
+  id: string,
   name: string,
   isComplete?: boolean,
   members?: member[]
 }
 
 export interface member {
-  id?: string,
+  id: string,
   name: string,
   isSettled?: boolean,
   expenses?: expense[]
 }
 
 export interface expense {
-  id?: string,
-  ammount: number,
+  id: string,
+  amount: number,
   title: string
 }
 
@@ -133,12 +133,17 @@ export async function addGroupRefToDeviceIfAbsent(
 export async function addExpenseToMember(
   groupId: string,
   memberId: string,
-  expense: expense): Promise<void> {
+  amount: number,
+  title: string): Promise<expense> {
+  const expense = {amount, title};
   try {
     const memberRef = doc(db, "groups", groupId, "members", memberId);
     const expenseRef = collection(memberRef, "expenses");
-    await addDoc(expenseRef, expense);
+    const newExpenseRef = await addDoc(expenseRef, expense);
     console.log(`Expense added to member ${memberId} in group ${groupId}`);
+    const expenseSnap = await getDoc(newExpenseRef);
+
+    return { id: newExpenseRef.id, ...expenseSnap.data()} as expense;
   } catch (e) {
     console.error("Error adding expense to member: ", e);
     throw e;
