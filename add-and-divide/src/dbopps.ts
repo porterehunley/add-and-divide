@@ -9,6 +9,7 @@ import {
   query,
   where,
   setDoc,
+  deleteDoc,
   getDocs,
   getDoc } from 'firebase/firestore';
 
@@ -16,6 +17,7 @@ export interface group {
   id: string,
   name: string,
   isComplete?: boolean,
+  transactions?: Transaction[],
   members?: member[]
 }
 
@@ -38,7 +40,61 @@ export interface GroupReference {
   name: string
 }
 
+export interface Transaction {
+  id: string,
+  groupId: string,
+  from: string,
+  to: string,
+  amount: number
+}
+
 const db = getFirestore(app);
+
+export async function createTransaction(
+  groupId: string,
+  from: string,
+  to: string,
+  amount: number): Promise<Transaction> {
+  try {
+    const transactionRef = collection(db, "groups", groupId, "transactions");
+    const newTransaction = {
+      groupId,
+      from,
+      to,
+      amount
+    };
+    const result = await addDoc(transactionRef, newTransaction);
+    console.log(`Transaction from ${from} to ${to} of amount ${amount} created in group ${groupId}.`);
+
+    return {
+      id: result.id,
+      groupId,
+      from,
+      to,
+      amount
+    };
+  } catch (e) {
+    console.error("Error creating transaction: ", e);
+    throw e;
+  }
+}
+
+export async function deleteAllTransactionsInGroup(groupId: string): Promise<void> {
+  try {
+    const transactionsRef = collection(db, "groups", groupId, "transactions");
+    const transactionsSnap = await getDocs(transactionsRef);
+
+    const deletePromises = transactionsSnap.docs.map((transactionDoc) => {
+      return deleteDoc(transactionDoc.ref);
+    });
+
+    await Promise.all(deletePromises);
+    console.log(`All transactions in group ${groupId} have been deleted.`);
+  } catch (e) {
+    console.error("Error deleting transactions: ", e);
+    throw e;
+  }
+}
 
 export async function getDeviceGroups(deviceId: string): Promise<GroupReference[]> {
   try {

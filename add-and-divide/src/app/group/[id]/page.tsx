@@ -14,7 +14,9 @@ import {
   markGroupAsSettled,
   markMemberAsSettled,
   markMemberAsNotSettled,
-  markGroupAsNotSettled
+  markGroupAsNotSettled,
+  deleteAllTransactionsInGroup,
+  createTransaction
 } from '@/dbopps';
 import ExpenseAdd from '@/components/ExpenseAdd';
 import MemberSelection from '@/components/MemberSelection';
@@ -102,7 +104,10 @@ export default function Group({ params }: { params: { id: string } }) {
       );
 
       if (unsettledMembers?.length === 1) {
-        await markGroupAsNotSettled(groupId);
+        await Promise.all([
+          markGroupAsNotSettled(groupId),
+          deleteAllTransactionsInGroup(groupId)
+        ]);
         updatedGroupData = {...updatedGroupData, isComplete: false};
       }
 
@@ -125,8 +130,14 @@ export default function Group({ params }: { params: { id: string } }) {
       member => member.isSettled
     );
     if (allMembersSettled) {
+      const opps = minimizeTransactions(updatedGroupData.members ?? []).map(transaction => (
+        createTransaction(
+          groupId, transaction.from, transaction.to, transaction.amount
+        )
+      ));
       await markGroupAsSettled(groupId);
-      updatedGroupData = {...updatedGroupData, isComplete: true};
+      const res = await Promise.all(opps);
+      updatedGroupData = {...updatedGroupData, isComplete: true, transactions: res};
     }
 
     setSelectedMember({...selectedMember, isSettled: true})

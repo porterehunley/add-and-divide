@@ -1,7 +1,7 @@
 import { member } from "./dbopps";
 
 
-type Transaction = {
+type BasicTransaction = {
   from: string;
   to: string;
   amount: number;
@@ -25,7 +25,7 @@ export function calculateNetBalances(members: member[]): { [key: string]: number
   return balances;
 }
 
-export function minimizeTransactions(members: member[]): Transaction[] {
+export function minimizeTransactions(members: member[]): BasicTransaction[] {
   const balances = calculateNetBalances(members);
   const creditors: { id: string; balance: number }[] = [];
   const debtors: { id: string; balance: number }[] = [];
@@ -41,7 +41,7 @@ export function minimizeTransactions(members: member[]): Transaction[] {
   creditors.sort((a, b) => b.balance - a.balance);
   debtors.sort((a, b) => a.balance - b.balance);
 
-  const transactions: Transaction[] = [];
+  const transactions: BasicTransaction[] = [];
 
   while (creditors.length && debtors.length) {
     const creditor = creditors[0];
