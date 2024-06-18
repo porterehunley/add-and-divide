@@ -232,9 +232,14 @@ export async function getGroupWithChildren(groupId: string): Promise<group> {
       })
     );
 
+    const transactionsCollectionRef = collection(groupRef, "transactions");
+    const transactionsSnap = await getDocs(transactionsCollectionRef);
+    const transactions = transactionsSnap.docs.map(transactionDoc => ({id: transactionDoc.id, ...transactionDoc.data()} as Transaction));
+
     return {
       ...groupData,
-      members
+      members,
+      transactions
     };
   } catch (e) {
     console.error("Error fetching group with children: ", e);

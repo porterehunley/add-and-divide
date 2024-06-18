@@ -267,7 +267,7 @@ export default function Group({ params }: { params: { id: string } }) {
         isOpen={showComplete}
         onRequestClose={() => setShowComplete(false)}
         title={'This group is complete'}>
-        {minimizeTransactions(groupData?.members || []).map((transaction, idx) =>
+        {groupData?.transactions?.map((transaction, idx) =>
           <div key={`${transaction.from}-${idx}`}>
             <p>{`from ${transaction.from}`}</p>
             <p>{`to ${transaction.to}`}</p>
