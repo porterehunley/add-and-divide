@@ -27,6 +27,7 @@ import HomeIcon from '@/components/ui/HomeIcon';
 import { useRouter } from 'next/navigation';
 import { getOrSetDeviceData } from '@/device';
 import { minimizeTransactions } from '@/calculator';
+import TransactionsView from '@/components/ui/TransactionsView';
 
 export default function Group({ params }: { params: { id: string } }) {
   const groupId = params.id;
@@ -267,13 +268,7 @@ export default function Group({ params }: { params: { id: string } }) {
         isOpen={showComplete}
         onRequestClose={() => setShowComplete(false)}
         title={'This group is complete'}>
-        {groupData?.transactions?.map((transaction, idx) =>
-          <div key={`${transaction.from}-${idx}`}>
-            <p>{`from ${transaction.from}`}</p>
-            <p>{`to ${transaction.to}`}</p>
-            <p>{`amount ${transaction.amount}`}</p>
-          </div>
-        )}
+        <TransactionsView transactions={groupData?.transactions ?? []}/>
       </BaseModal>
     </main>
   );
