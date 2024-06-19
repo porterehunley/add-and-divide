@@ -246,7 +246,7 @@ export default function Group({ params }: { params: { id: string } }) {
               setSelectedMember(member);
               setShowMemberSelection(false);
             }}/>
-          <div className="flex items-center gap-2 w-full pt-4 flex-col" >
+          <div className="flex items-center gap-2 w-full pt-4 flex-col">
             <Input
               className="border-[#e6e6e6] dark:border-[#3c3c58] bg-[#f0f0f5] dark:bg-[#2c2c54] text-[#6b5b95]"
               placeholder="Add Member"

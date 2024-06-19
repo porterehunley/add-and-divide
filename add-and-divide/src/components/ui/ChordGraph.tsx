@@ -11,54 +11,62 @@ export default function ChordGraph({flow, colors}: ChordGraphProps) {
   const vizAnchor = useRef(null);
 
   useLayoutEffect(() => {
-    if (vizAnchor) {
+    if (vizAnchor && flow.length) {
       renderChart(vizAnchor.current)
     }
-  }, [vizAnchor])
+  }, [vizAnchor, flow])
 
   function renderChart(el: SVGSVGElement | null) {
-    const width = 440;
-    const height = 440;
+    const width = 220;
+    const height = 220;
+    const radius = 100;
 
     const svg = d3.select(el)
       .attr("width", width)
       .attr("height", height)
+      .select('#chart-body')
+        .attr("transform", `translate(${width/2}, ${height/2})`);
 
-    const res = d3.chord()
-      .padAngle(.05)
-      .sortSubgroups(d3.descending)
-      (flow)
+    const circles = svg.selectAll('circle')
+      .data(flow);
 
-    svg.datum(res)
-      .append('g')
-      .selectAll('g')
-      .data(d => (d.groups))
-      .enter()
-      .append('g')
+    const angleStep = (2 * Math.PI) / flow.length;
+
+    circles.enter()
+      .append('circle')
+      .attr('cx', (d, i) => radius * Math.cos(i * angleStep)) // x-coordinate based on angle
+      .attr('cy', (d, i) => radius * Math.sin(i * angleStep)) // y-coordinate based on angle
+      .attr('r', 10) // Radius of the circle
+      .style('fill', (d, i) => colors[i % colors.length]); // Use colors from the colors array
+
+    const paths = svg.selectAll('path')
+      .data(flow.flatMap(
+        (row, i) => row.map(
+          (value, j) => ({ source: i, target: j, value, color: colors[i] })
+        ).filter(v => v.value > 0)
+      ));
+
+    paths.enter()
       .append('path')
-        .style('fill', (d,i) => (colors[i]))
-        .style('stroke', 'black')
-        .attr('d', d => d3.arc()({
-          innerRadius: 200,
-          outerRadius: 210,
-          startAngle: d.startAngle,
-          endAngle: d.endAngle
-        }));
-
-    svg.datum(res)
-      .append('g')
-      .selectAll('path')
-      .data(d => (d))
-      .enter()
-      .append('path')
-        .attr('d', d => d3.ribbon().radius(200)(d))
-        .style('fill', (d) => (colors[d.source.index]))
-        .style('stroke', 'black');
+      .attr('d', d => {
+        const sourceAngle = d.source * angleStep;
+        const targetAngle = d.target * angleStep;
+        const sourceX = radius * Math.cos(sourceAngle);
+        const sourceY = radius * Math.sin(sourceAngle);
+        const targetX = radius * Math.cos(targetAngle);
+        const targetY = radius * Math.sin(targetAngle);
+        return `M${sourceX},${sourceY}A${radius},${radius} 0 0,1 ${targetX},${targetY}`;
+      })
+      .style('fill', 'none')
+      .style('stroke', (d)=> (d.color))
+      .style('stroke-width', 2);
   }
 
   return (
     <div>
-      <svg id='content' ref={vizAnchor}/>
+      <svg id='content' ref={vizAnchor}>
+        <g id='chart-body'/>
+      </svg>
     </div>
   );
 }
