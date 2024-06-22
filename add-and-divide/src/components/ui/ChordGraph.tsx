@@ -32,13 +32,6 @@ export default function ChordGraph({flow, colors}: ChordGraphProps) {
 
     const angleStep = (2 * Math.PI) / flow.length;
 
-    circles.enter()
-      .append('circle')
-      .attr('cx', (d, i) => radius * Math.cos(i * angleStep)) // x-coordinate based on angle
-      .attr('cy', (d, i) => radius * Math.sin(i * angleStep)) // y-coordinate based on angle
-      .attr('r', 10) // Radius of the circle
-      .style('fill', (d, i) => colors[i % colors.length]); // Use colors from the colors array
-
     const paths = svg.selectAll('path')
       .data(flow.flatMap(
         (row, i) => row.map(
@@ -60,6 +53,13 @@ export default function ChordGraph({flow, colors}: ChordGraphProps) {
       .style('fill', 'none')
       .style('stroke', (d)=> (d.color))
       .style('stroke-width', 2);
+
+    circles.enter()
+      .append('circle')
+      .attr('cx', (d, i) => radius * Math.cos(i * angleStep)) // x-coordinate based on angle
+      .attr('cy', (d, i) => radius * Math.sin(i * angleStep)) // y-coordinate based on angle
+      .attr('r', 10) // Radius of the circle
+      .style('fill', (d, i) => colors[i % colors.length]); // Use colors from the colors array
   }
 
   return (
